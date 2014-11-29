@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+license_terms() {
+  cat <<EOF_MIT_LICENSE_TERMS
+
+Copyright Damien Nozay
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+EOF_MIT_LICENSE_TERMS
+}
+
+__SCRIPT_VERSION="0.1"
+__SCRIPT_REPOSITORY="TBD"
+version_info() {
+  cat <<EOF_VERSION
+version ${__SCRIPT_VERSION} (repo: ${__SCRIPT_REPOSITORY})
+EOF_VERSION
+}
+
+# inspired greatly by the .osx dotfiles script.
+# ~/.osx — https://mths.be/osx
+# https://github.com/mathiasbynens/dotfiles
+
+# to colorize output.
+_RESET="\033[0m"
+_BOLD="\033[1m"
+_RED="\033[31m"
+_GREEN="\033[32m"
+_YELLOW="\033[33m"
+
+_SCUTIL="${_RED}[scutil]${_RESET}"
+_PMSET="${_RED}[pmset]${_RESET}"
+_DEFAULTS="${_RED}[defaults]${_RESET}"
+_NVRAM="${_RED}[nvram]${_RESET}"
+
+usage() {
+    cat <<EOFUSAGE
+  $0 [key]
+  $0 --list
+  $0 --help
+
+  This script reads configuration settings stored in various places.
+  One obvious purpose is to inform the user about how the machine is currently
+  configured so that if the user decides to change any setting, they may be
+  able to first store/output the setting as a precaution.
+
+  Arguments:
+      key          Name of the setting to read.
+                   Use --list to check which settings are available.
+
+  Options:
+      --help       Bring up this usage screen.
+      --list       List all keys.
+      --license    Output license terms.
+      --version    Output version information.
+      --all        Reads all settings.
+
+EOFUSAGE
+}
+
+_mainscript=$0
+
+case "$1" in
+  (--help|"")
+    usage;
+    ;;
+
+  (--license)
+    license_terms;
+    ;;
+
+  (--version)
+    version_info;
+    ;;
+
+  (--all)
+    $_mainscript computername;
+    $_mainscript hostname;
+    $_mainscript localhostname;
+    $_mainscript netbiosname;
+    $_mainscript live_standbydelay;
+    $_mainscript nvram_systemaudiovolume
+    ;;
+
+  (computername)
+    __computername=$(scutil --get ComputerName)
+    echo -e "${_SCUTIL} Computer name is set to ${_YELLOW}${__computername}${_RESET}."
+    ;;
+
+  (hostname)
+    __hostname=$(scutil --get HostName)
+    echo -e "${_SCUTIL} Hostname is set to ${_YELLOW}${__hostname}${_RESET}."
+    ;;
+
+  (localhostname)
+    __localhostname=$(scutil --get LocalHostName)
+    echo -e "${_SCUTIL} LocalHostname is set to ${_YELLOW}${__localhostname}${_RESET}."
+    ;;
+
+  (netbiosname)
+    __netbiosname=$(defaults read /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName)
+    echo -e "${_DEFAULTS} NetBIOSName is set to ${_YELLOW}${__netbiosname}${_RESET}."
+    ;;
+
+  (live_standbydelay)
+    __standbydelay=$(pmset -g live | grep standbydelay | awk '{print $2}')
+    __standbydelay_h=$(expr ${__standbydelay} / 3600)
+    __standbydelay_ms=$(expr ${__standbydelay} % 3600)
+    __standbydelay_m=$(expr ${__standbydelay_ms} / 60)
+    __standbydelay_s=$(expr ${__standbydelay_ms} % 60)
+    echo -e "${_PMSET} Live stand-by delay is set to ${_BOLD}${__standbydelay}${_RESET} (${_YELLOW}${__standbydelay_h}h ${__standbydelay_m}m ${__standbydelay_s}s${_RESET})."
+    ;;
+
+  (nvram_systemaudiovolume)
+    __nvram_systemaudiovolume=$(nvram SystemAudioVolume | awk '{print $2}')
+    __nvram_systemaudiovolume_human=$(test "${__nvram_systemaudiovolume}" = "T" && echo true || echo false)
+    echo -e "${_NVRAM} System audio volume is set to ${_BOLD}${__nvram_systemaudiovolume}${_RESET} (${_YELLOW}${__nvram_systemaudiovolume_human}${_RESET})."
+    ;;
+
+#
+# handle unrecognized options / arguments.
+# this needs to stay last.
+#
+
+  (-*)
+    echo -en "${_RED}Unrecognized option:${_RESET} "; echo $1; echo;
+    usage;
+    exit 1;
+    ;;
+
+  (*)
+    echo -en "${_RED}Unrecognized key:${_RESET} "; echo $1; echo;
+    usage;
+    exit 1;
+    ;;
+esac
