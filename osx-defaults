@@ -27,7 +27,7 @@ EOF_MIT_LICENSE_TERMS
 }
 
 __SCRIPT_VERSION="0.1"
-__SCRIPT_REPOSITORY="TBD"
+__SCRIPT_REPOSITORY="https://github.com/dnozay/osx-defaults"
 version_info() {
   cat <<EOF_VERSION
 version ${__SCRIPT_VERSION} (repo: ${__SCRIPT_REPOSITORY})
