@@ -45,11 +45,6 @@ _RED="\033[31m"
 _GREEN="\033[32m"
 _YELLOW="\033[33m"
 
-_SCUTIL="${_RED}[scutil]${_RESET}"
-_PMSET="${_RED}[pmset]${_RESET}"
-_DEFAULTS="${_RED}[defaults]${_RESET}"
-_NVRAM="${_RED}[nvram]${_RESET}"
-
 usage() {
     cat <<EOFUSAGE
   $0 [key]
@@ -79,6 +74,12 @@ EOFUSAGE
 # helper methods to read settings
 #
 
+_SCUTIL="${_RED}[scutil]${_RESET}"
+_PMSET="${_RED}[pmset]${_RESET}"
+_DEFAULTS="${_RED}[defaults]${_RESET}"
+_NVRAM="${_RED}[nvram]${_RESET}"
+
+
 read_scutil() {
   name=$1
   scutil --get $name
@@ -87,7 +88,7 @@ read_scutil() {
 describe_scutil() {
   name=$1
   description=$2
-  value=$(read_scutil $1 2>/dev/null)
+  value=$(read_scutil $name 2>/dev/null)
   if test -n "$value"; then
     echo -e "${_SCUTIL} ${description} is set to ${_YELLOW}${value}${_RESET}."
   else
@@ -95,6 +96,23 @@ describe_scutil() {
   fi
 }
 
+read_defaults() {
+  domain=$1
+  key=$2
+  defaults read $domain $key
+}
+
+describe_defaults() {
+  domain=$1
+  key=$2
+  description=$3
+  value=$(read_defaults $domain $key 2>/dev/null)
+  if test -n "$value"; then
+    echo -e "${_DEFAULTS} ${description} is set to ${_YELLOW}${value}${_RESET}."
+  else
+    echo -e "${_DEFAULTS} ${description} is ${_RED}not set${_RESET}."
+  fi
+}
 
 #
 # options/argument parsing.
@@ -137,8 +155,7 @@ case "$1" in
     ;;
 
   (netbiosname)
-    __netbiosname=$(defaults read /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName)
-    echo -e "${_DEFAULTS} NetBIOSName is set to ${_YELLOW}${__netbiosname}${_RESET}."
+    describe_defaults "/Library/Preferences/SystemConfiguration/com.apple.smb.server" "NetBIOSName" "NetBIOSName"
     ;;
 
   (live_standbydelay)
