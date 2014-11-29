@@ -131,6 +131,14 @@ parse_boolean() {
   esac
 }
 
+parse_seconds() {
+  read value;
+  __seconds=$(expr $value % 60)
+  __minutes=$(expr $value / 60 % 60)
+  __hours=$(expr $value / 3600)
+  echo "${__hours}h ${__minutes}m ${__seconds}s"
+}
+
 #
 # options/argument parsing.
 #
@@ -177,11 +185,8 @@ case "$1" in
 
   (live_standbydelay)
     __standbydelay=$(pmset -g live | grep standbydelay | awk '{print $2}')
-    __standbydelay_h=$(expr ${__standbydelay} / 3600)
-    __standbydelay_ms=$(expr ${__standbydelay} % 3600)
-    __standbydelay_m=$(expr ${__standbydelay_ms} / 60)
-    __standbydelay_s=$(expr ${__standbydelay_ms} % 60)
-    echo -e "${_PMSET} Live stand-by delay is set to ${_BOLD}${__standbydelay}${_RESET} (${_YELLOW}${__standbydelay_h}h ${__standbydelay_m}m ${__standbydelay_s}s${_RESET})."
+    __standbydelay_human=$(echo ${__standbydelay} | parse_seconds)
+    echo -e "${_PMSET} Live stand-by delay is set to ${_BOLD}${__standbydelay}${_RESET} (${_YELLOW}${__standbydelay_human}${_RESET})."
     ;;
 
   (nvram_systemaudiovolume)
