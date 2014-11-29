@@ -115,6 +115,23 @@ describe_defaults() {
 }
 
 #
+# filters
+#
+
+parse_boolean() {
+  read value
+  case "$value" in
+    (T|t|true|1)
+      echo true;;
+    (F|f|false|0)
+      echo false;;
+    (*)
+      # unsure.
+      echo "$value ???";;
+  esac
+}
+
+#
 # options/argument parsing.
 #
 
@@ -169,7 +186,7 @@ case "$1" in
 
   (nvram_systemaudiovolume)
     __nvram_systemaudiovolume=$(nvram SystemAudioVolume | awk '{print $2}')
-    __nvram_systemaudiovolume_human=$(test "${__nvram_systemaudiovolume}" = "T" && echo true || echo false)
+    __nvram_systemaudiovolume_human=$(echo ${__nvram_systemaudiovolume} | parse_boolean)
     echo -e "${_NVRAM} System audio volume is set to ${_BOLD}${__nvram_systemaudiovolume}${_RESET} (${_YELLOW}${__nvram_systemaudiovolume_human}${_RESET})."
     ;;
 
