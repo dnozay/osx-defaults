@@ -165,24 +165,25 @@ case "$1" in
     $_mainscript localhostname;
     $_mainscript netbiosname;
     $_mainscript live_standbydelay;
-    $_mainscript nvram_systemaudiovolume
+    $_mainscript nvram_systemaudiovolume;
+    $_mainscript ui.transparency;
+    $_mainscript ui.highlightcolor;
+    $_mainscript ui.sidebar.iconsize;
+    $_mainscript ui.scrollbars;
+    $_mainscript ui.smoothscrolling;
     ;;
 
   (computername)
-    describe_scutil "ComputerName" "ComputerName"
-    ;;
+    describe_scutil "ComputerName" "ComputerName";;
 
   (hostname)
-    describe_scutil "HostName" "HostName"
-    ;;
+    describe_scutil "HostName" "HostName";;
 
   (localhostname)
-    describe_scutil "LocalHostName" "LocalHostName"
-    ;;
+    describe_scutil "LocalHostName" "LocalHostName";;
 
   (netbiosname)
-    describe_defaults "/Library/Preferences/SystemConfiguration/com.apple.smb.server" "NetBIOSName" "NetBIOSName"
-    ;;
+    describe_defaults "/Library/Preferences/SystemConfiguration/com.apple.smb.server" "NetBIOSName" "NetBIOSName";;
 
   (live_standbydelay)
     __standbydelay=$(pmset -g live | grep standbydelay | awk '{print $2}')
@@ -195,6 +196,24 @@ case "$1" in
     __nvram_systemaudiovolume_human=$(echo ${__nvram_systemaudiovolume} | parse_boolean)
     echo -e "${_NVRAM} System audio volume is set to ${_BOLD}${__nvram_systemaudiovolume}${_RESET} (${_YELLOW}${__nvram_systemaudiovolume_human}${_RESET})."
     ;;
+
+#
+# UI
+#
+  (ui.transparency)
+    describe_defaults "com.apple.universalaccess" "reduceTransparency" "UI transparency";;
+
+  (ui.highlightcolor)
+    describe_defaults "NSGlobalDomain" "AppleHighlightColor" "Highlight color";;
+
+  (ui.sidebar.iconsize)
+    describe_defaults "NSGlobalDomain" "NSTableViewDefaultSizeMode" "Sidebar Icon Size";;
+
+  (ui.scrollbars)
+    describe_defaults "NSGlobalDomain" "AppleShowScrollBars" "Scrollbars behavior";;
+
+  (ui.smoothscrolling)
+    describe_defaults "NSGlobalDomain" "NSScrollAnimationEnabled" "Smooth Scrolling";;
 
 #
 # handle unrecognized options / arguments.
