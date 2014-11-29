@@ -75,6 +75,31 @@ usage() {
 EOFUSAGE
 }
 
+#
+# helper methods to read settings
+#
+
+read_scutil() {
+  name=$1
+  scutil --get $name
+}
+
+describe_scutil() {
+  name=$1
+  description=$2
+  value=$(read_scutil $1 2>/dev/null)
+  if test -n "$value"; then
+    echo -e "${_SCUTIL} ${description} is set to ${_YELLOW}${value}${_RESET}."
+  else
+    echo -e "${_SCUTIL} ${description} is ${_RED}not set${_RESET}."
+  fi
+}
+
+
+#
+# options/argument parsing.
+#
+
 _mainscript=$0
 
 case "$1" in
@@ -100,18 +125,15 @@ case "$1" in
     ;;
 
   (computername)
-    __computername=$(scutil --get ComputerName)
-    echo -e "${_SCUTIL} Computer name is set to ${_YELLOW}${__computername}${_RESET}."
+    describe_scutil "ComputerName" "ComputerName"
     ;;
 
   (hostname)
-    __hostname=$(scutil --get HostName)
-    echo -e "${_SCUTIL} Hostname is set to ${_YELLOW}${__hostname}${_RESET}."
+    describe_scutil "HostName" "HostName"
     ;;
 
   (localhostname)
-    __localhostname=$(scutil --get LocalHostName)
-    echo -e "${_SCUTIL} LocalHostname is set to ${_YELLOW}${__localhostname}${_RESET}."
+    describe_scutil "LocalHostName" "LocalHostName"
     ;;
 
   (netbiosname)
