@@ -149,6 +149,10 @@ _mainscript=$0
 _keyarg=$1
 _KEYARG="${_BLACK}(${_keyarg})${_RESET}"
 
+list_keys() {
+  grep "#[ ]list-key" $_mainscript | perl -n -e'/\((.*)\)/ && print "$1\n" '
+}
+
 case "$1" in
   (--help|"")
     usage;
@@ -162,39 +166,35 @@ case "$1" in
     version_info;
     ;;
 
-  (--all)
-    $_mainscript computername;
-    $_mainscript hostname;
-    $_mainscript localhostname;
-    $_mainscript netbiosname;
-    $_mainscript live_standbydelay;
-    $_mainscript nvram_systemaudiovolume;
-    $_mainscript ui.transparency;
-    $_mainscript ui.highlightcolor;
-    $_mainscript ui.sidebar.iconsize;
-    $_mainscript ui.scrollbars;
-    $_mainscript ui.smoothscrolling;
+  (--list)
+    list_keys;
     ;;
 
-  (computername)
+  (--all)
+    for key in $(list_keys); do
+      $_mainscript $key;
+    done
+    ;;
+
+  (computername) # list-key
     describe_scutil "ComputerName" "ComputerName";;
 
-  (hostname)
+  (hostname) # list-key
     describe_scutil "HostName" "HostName";;
 
-  (localhostname)
+  (localhostname) # list-key
     describe_scutil "LocalHostName" "LocalHostName";;
 
-  (netbiosname)
+  (netbiosname) # list-key
     describe_defaults "/Library/Preferences/SystemConfiguration/com.apple.smb.server" "NetBIOSName" "NetBIOSName";;
 
-  (live_standbydelay)
+  (live_standbydelay) # list-key
     __standbydelay=$(pmset -g live | grep standbydelay | awk '{print $2}')
     __standbydelay_human=$(echo ${__standbydelay} | parse_seconds)
     echo -e "${_PMSET}${_KEYARG} Live stand-by delay is set to ${_BOLD}${__standbydelay}${_RESET} (${_YELLOW}${__standbydelay_human}${_RESET})."
     ;;
 
-  (nvram_systemaudiovolume)
+  (nvram_systemaudiovolume) # list-key
     __nvram_systemaudiovolume=$(nvram SystemAudioVolume | awk '{print $2}')
     __nvram_systemaudiovolume_human=$(echo ${__nvram_systemaudiovolume} | parse_boolean)
     echo -e "${_NVRAM}${_KEYARG} System audio volume is set to ${_BOLD}${__nvram_systemaudiovolume}${_RESET} (${_YELLOW}${__nvram_systemaudiovolume_human}${_RESET})."
@@ -203,19 +203,19 @@ case "$1" in
 #
 # UI
 #
-  (ui.transparency)
+  (ui.transparency) # list-key
     describe_defaults "com.apple.universalaccess" "reduceTransparency" "UI transparency";;
 
-  (ui.highlightcolor)
+  (ui.highlightcolor) # list-key
     describe_defaults "NSGlobalDomain" "AppleHighlightColor" "Highlight color";;
 
-  (ui.sidebar.iconsize)
+  (ui.sidebar.iconsize) # list-key
     describe_defaults "NSGlobalDomain" "NSTableViewDefaultSizeMode" "Sidebar Icon Size";;
 
-  (ui.scrollbars)
+  (ui.scrollbars) # list-key
     describe_defaults "NSGlobalDomain" "AppleShowScrollBars" "Scrollbars behavior";;
 
-  (ui.smoothscrolling)
+  (ui.smoothscrolling) # list-key
     describe_defaults "NSGlobalDomain" "NSScrollAnimationEnabled" "Smooth Scrolling";;
 
 #
