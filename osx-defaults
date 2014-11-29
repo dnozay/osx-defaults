@@ -42,6 +42,7 @@ EOF_VERSION
 # to colorize output.
 _RESET="\033[0m"
 _BOLD="\033[1m"
+_BLACK="\033[30m"
 _RED="\033[31m"
 _GREEN="\033[32m"
 _YELLOW="\033[33m"
@@ -91,9 +92,9 @@ describe_scutil() {
   description=$2
   value=$(read_scutil $name 2>/dev/null)
   if test -n "$value"; then
-    echo -e "${_SCUTIL} ${description} is set to ${_YELLOW}${value}${_RESET}."
+    echo -e "${_SCUTIL}${_KEYARG} ${description} is set to ${_YELLOW}${value}${_RESET}."
   else
-    echo -e "${_SCUTIL} ${description} is ${_RED}not set${_RESET}."
+    echo -e "${_SCUTIL}${_KEYARG} ${description} is ${_RED}not set${_RESET}."
   fi
 }
 
@@ -109,9 +110,9 @@ describe_defaults() {
   description=$3
   value=$(read_defaults $domain $key 2>/dev/null)
   if test -n "$value"; then
-    echo -e "${_DEFAULTS} ${description} is set to ${_YELLOW}${value}${_RESET}."
+    echo -e "${_DEFAULTS}${_KEYARG} ${description} is set to ${_YELLOW}${value}${_RESET}."
   else
-    echo -e "${_DEFAULTS} ${description} is ${_RED}not set${_RESET}."
+    echo -e "${_DEFAULTS}${_KEYARG} ${description} is ${_RED}not set${_RESET}."
   fi
 }
 
@@ -145,6 +146,8 @@ parse_seconds() {
 #
 
 _mainscript=$0
+_keyarg=$1
+_KEYARG="${_BLACK}(${_keyarg})${_RESET}"
 
 case "$1" in
   (--help|"")
@@ -188,13 +191,13 @@ case "$1" in
   (live_standbydelay)
     __standbydelay=$(pmset -g live | grep standbydelay | awk '{print $2}')
     __standbydelay_human=$(echo ${__standbydelay} | parse_seconds)
-    echo -e "${_PMSET} Live stand-by delay is set to ${_BOLD}${__standbydelay}${_RESET} (${_YELLOW}${__standbydelay_human}${_RESET})."
+    echo -e "${_PMSET}${_KEYARG} Live stand-by delay is set to ${_BOLD}${__standbydelay}${_RESET} (${_YELLOW}${__standbydelay_human}${_RESET})."
     ;;
 
   (nvram_systemaudiovolume)
     __nvram_systemaudiovolume=$(nvram SystemAudioVolume | awk '{print $2}')
     __nvram_systemaudiovolume_human=$(echo ${__nvram_systemaudiovolume} | parse_boolean)
-    echo -e "${_NVRAM} System audio volume is set to ${_BOLD}${__nvram_systemaudiovolume}${_RESET} (${_YELLOW}${__nvram_systemaudiovolume_human}${_RESET})."
+    echo -e "${_NVRAM}${_KEYARG} System audio volume is set to ${_BOLD}${__nvram_systemaudiovolume}${_RESET} (${_YELLOW}${__nvram_systemaudiovolume_human}${_RESET})."
     ;;
 
 #
