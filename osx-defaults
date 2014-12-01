@@ -155,26 +155,30 @@ list_keys() {
 
 case "$1" in
   (--help|"")
-    usage;
-    ;;
+    usage;;
 
   (--license)
-    license_terms;
-    ;;
+    license_terms;;
 
   (--version)
-    version_info;
-    ;;
+    version_info;;
 
   (--list)
-    list_keys;
-    ;;
+    list_keys;;
 
   (--all)
     for key in $(list_keys); do
       $_mainscript $key;
     done
     ;;
+
+#
+# NOTE: please finish the line with "# list-key" for it to be listed properly
+#
+
+#
+# System specific.
+#
 
   (computername) # list-key
     describe_scutil "ComputerName" "ComputerName";;
@@ -225,13 +229,9 @@ case "$1" in
 
   (-*)
     echo -en "${_RED}Unrecognized option:${_RESET} "; echo $1; echo;
-    usage;
-    exit 1;
-    ;;
+    usage; exit 1;;
 
   (*)
     echo -en "${_RED}Unrecognized key:${_RESET} "; echo $1; echo;
-    usage;
-    exit 1;
-    ;;
+    usage; exit 1;;
 esac
