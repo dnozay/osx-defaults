@@ -180,25 +180,25 @@ case "$1" in
 # System specific.
 #
 
-  (computername) # list-key
+  (sys.computername) # list-key
     describe_scutil "ComputerName" "ComputerName";;
 
-  (hostname) # list-key
+  (sys.hostname) # list-key
     describe_scutil "HostName" "HostName";;
 
-  (localhostname) # list-key
+  (sys.localhostname) # list-key
     describe_scutil "LocalHostName" "LocalHostName";;
 
-  (netbiosname) # list-key
+  (sys.netbiosname) # list-key
     describe_defaults "/Library/Preferences/SystemConfiguration/com.apple.smb.server" "NetBIOSName" "NetBIOSName";;
 
-  (live_standbydelay) # list-key
+  (sys.live.standbydelay) # list-key
     __standbydelay=$(pmset -g live | grep standbydelay | awk '{print $2}')
     __standbydelay_human=$(echo ${__standbydelay} | parse_seconds)
     echo -e "${_PMSET}${_KEYARG} Live stand-by delay is set to ${_BOLD}${__standbydelay}${_RESET} (${_YELLOW}${__standbydelay_human}${_RESET})."
     ;;
 
-  (nvram_systemaudiovolume) # list-key
+  (sys.nvram.systemaudiovolume) # list-key
     __nvram_systemaudiovolume=$(nvram SystemAudioVolume | awk '{print $2}')
     __nvram_systemaudiovolume_human=$(echo ${__nvram_systemaudiovolume} | parse_boolean)
     echo -e "${_NVRAM}${_KEYARG} System audio volume is set to ${_BOLD}${__nvram_systemaudiovolume}${_RESET} (${_YELLOW}${__nvram_systemaudiovolume_human}${_RESET})."
