@@ -6,6 +6,7 @@ One obvious purpose is to inform the user about how the machine is currently
 configured so that if the user decides to change any setting, they may be
 able to first store/output the setting as a precaution.
 
+![screenshot](https://cloud.githubusercontent.com/assets/205466/5249773/da550d4c-793a-11e4-8182-9914746cab00.png)
 
 # credits
 
