@@ -150,7 +150,7 @@ _keyarg=$1
 _KEYARG="${_BLACK}(${_keyarg})${_RESET}"
 
 list_keys() {
-  grep "#[ ]list-key" $_mainscript | perl -n -e'/\((.*)\)/ && print "$1\n" '
+  grep "#[ ]list-key\$" $_mainscript | perl -n -e'/\((.*)\)/ && print "$1\n" '
 }
 
 case "$1" in
